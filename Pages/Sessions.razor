@@ -19,13 +19,33 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var session in SessionService.GetSessions().OrderBy(a => a.When))
+        @foreach (var session in sessions.OrderBy(a => a.When))
         {
-            <tr>
+            RenderFragment hiddenContent = 
+                @<div>
+                    <p><b>Lectures:</b></p>
+                    <table class="table table-secondary">
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var lecture in session.Lectures)
+                            {
+                                <tr>
+                                    <td>@lecture.Id</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <AddNewLectureForm Session=@session />
+                </div>;
+            <CollapsibleTableRow HiddenContent="@hiddenContent">
                 <td>@session.Id</td>
                 <td>@session.When</td>
                 <td>@session.Chair?.DisplayName</td>
-            </tr>
+            </CollapsibleTableRow>
         }
     </tbody>
 </table>
@@ -61,8 +81,13 @@
     
     private IReadOnlyList<Author> authors = Array.Empty<Author>();
 
-    protected override void OnInitialized() => 
+    private IReadOnlyList<Session> sessions = Array.Empty<Session>();
+
+    protected override void OnInitialized()
+    {
         authors = AuthorService.GetAuthors();
-    
+        sessions = SessionService.GetSessions();
+    }
+
     private void HandleValidSubmit() => SessionService.CreateSession(createSessionModel);
 }

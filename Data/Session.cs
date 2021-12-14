@@ -7,6 +7,8 @@ public class Session
     public DateTime When { get; init; }
 
     public Author? Chair { get; set; }
+    
+    public List<Lecture> Lectures { get; init; } = new List<Lecture>();
 
     public Session(int sessionId, DateTime when) =>
         (Id, When) = (sessionId, when);
