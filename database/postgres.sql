@@ -25,13 +25,13 @@ VALUES
 	('SEQUEL: A Structured English Query Language', 'Programming Languages'),
 	('How to Match Jobs and Candidates - A Recruitment Support System Based on Feature Engineering and Advanced Analytics.', 'Recommender systems');
 	
--- SESSION to też keyword. Żeby powiedzieć SQL-owi, że chodzi nam o nazwę
--- tabeli, stawiamy w podwójne ciapki. Tak samo dla keyworda WHEN i kolumny.
+-- SESSION is also a keyword. To tell SQL that we mean the table name,
+-- put it in double quotes. Same applies for WHEN as a keyword and column name.
 CREATE TABLE "session" (
     id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    "when" TIMESTAMP(0) NOT NULL, -- TIMESTAMP to type DATETIME w Postgresie
-								  -- Argument to precyzja sekund. 
-								  -- 0 oznacza 0 miejsc po przecinku, czyli co do sekundy.
+    "when" TIMESTAMP(0) NOT NULL, -- TIMESTAMP is the DATETIME in Postgres
+                                  -- The argument is the precision of seconds. 
+	                          -- 0 means 0 after decimal point, so up to a second.
     chair_id INTEGER REFERENCES author NOT NULL
 );
 
