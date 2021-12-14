@@ -1,0 +1,82 @@
+@page "/papers"
+
+<PageTitle>Papers</PageTitle>
+
+@using Conference.Data
+@inject AuthorService AuthorService
+@inject PaperService PaperService
+
+<h1>Papers</h1>
+
+<p>Papers submitted for the Conference.</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Classification</th>
+            <th>Authors</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var paper in PaperService.GetPapers().OrderBy(a => a.Id))
+        {
+            <tr>
+                <td>@paper.Id</td>
+                <td>@paper.Name</td>
+                <td>@paper.Classification</td>
+                <td>@GetAuthorNameList(paper)</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h2>Add a new Paper:</h2>
+
+<EditForm Model="@createPaperModel" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <p>
+        <label>
+            Name:
+            <InputText id="name" @bind-Value="createPaperModel.Name" />
+        </label>
+    </p>
+    <p>
+        <label>
+            Classification:
+            <InputText id="classification" @bind-Value="createPaperModel.Classification" />
+        </label>
+    </p>
+    <p>
+        <label>
+            Authors:
+            <RadzenListBox @bind-Value=@createPaperModel.AuthorIds 
+                Multiple="true" 
+                Data="@authors"
+                TextProperty="@nameof(Author.DisplayName)"
+                ValueProperty="@nameof(Author.Id)"></RadzenListBox>
+        </label>
+    </p>
+    
+    <button type="submit">Submit</button>
+</EditForm>
+
+@code {
+    private CreatePaper createPaperModel = new();
+
+    private IEnumerable<Author> authors = Enumerable.Empty<Author>();
+
+    private void HandleValidSubmit() => PaperService.CreatePaper(createPaperModel);
+
+    protected override void OnInitialized() => authors = AuthorService.GetAuthors();
+
+    private static string GetAuthorNameList(Paper paper)
+    {
+        var displayNames = paper.Authors.Select(a => a.DisplayName);
+
+        return string.Join(", ", displayNames);
+    } 
+}

@@ -1,0 +1,59 @@
+@page "/authors"
+
+<PageTitle>Authors</PageTitle>
+
+@using Conference.Data
+@inject AuthorService AuthorService
+
+<h1>Authors</h1>
+
+<p>Authors registered for the Conference.</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Surname</th>
+            <th>Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var author in AuthorService.GetAuthors().OrderBy(a => a.Id))
+        {
+            <tr>
+                <td>@author.Id</td>
+                <td>@author.Surname</td>
+                <td>@author.Name</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h2>Add a new Author:</h2>
+
+<EditForm Model="@createAuthorModel" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <p>
+        <label>
+            Name:
+            <InputText id="name" @bind-Value="createAuthorModel.Name" />
+        </label>
+    </p>
+    <p>
+        <label>
+            Surname:
+            <InputText id="surname" @bind-Value="createAuthorModel.Surname" />
+        </label>
+    </p>
+    
+    <button type="submit">Submit</button>
+</EditForm>
+
+@code {
+    private CreateAuthor createAuthorModel = new();
+
+    private void HandleValidSubmit() => 
+        AuthorService.CreateAuthor(createAuthorModel);
+}

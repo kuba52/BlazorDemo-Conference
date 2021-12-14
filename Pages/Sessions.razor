@@ -1,0 +1,68 @@
+@page "/sessions"
+
+<PageTitle>Sessions</PageTitle>
+
+@using Conference.Data
+@inject AuthorService AuthorService
+@inject SessionService SessionService
+
+<h1>Sessions</h1>
+
+<p>Sessions scheduled.</p>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>When</th>
+            <th>Chair</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var session in SessionService.GetSessions().OrderBy(a => a.When))
+        {
+            <tr>
+                <td>@session.Id</td>
+                <td>@session.When</td>
+                <td>@session.Chair?.DisplayName</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h2>Add a new Session:</h2>
+
+<EditForm Model="@createSessionModel" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <p>
+        <label>
+            When:
+            <RadzenDatePicker @bind-Value="@createSessionModel.When" ShowTime="true" />
+        </label>
+    </p>
+    <p>
+        <label>
+            Chair:
+            <InputSelect id="chair" @bind-Value="@createSessionModel.ChairId">
+                @foreach (var author in authors.OrderBy(a => a.DisplayName))
+                {
+                    <option value="@author.Id">@author.DisplayName</option>
+                }
+            </InputSelect>
+        </label>
+    </p>
+    <button type="submit">Submit</button>
+</EditForm>
+
+@code {
+    private CreateSession createSessionModel = new() { When = DateTime.Now };   
+    
+    private IReadOnlyList<Author> authors = Array.Empty<Author>();
+
+    protected override void OnInitialized() => 
+        authors = AuthorService.GetAuthors();
+    
+    private void HandleValidSubmit() => SessionService.CreateSession(createSessionModel);
+}
