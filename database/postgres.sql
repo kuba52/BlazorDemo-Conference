@@ -5,13 +5,13 @@ CREATE TABLE author (
 );
 
 INSERT INTO author (name, surname)
-VALUES 
+VALUES
 	('Filip', 'Murlak'),
 	('Krzysztof', 'Stencel'),
 	('Krzysztof', 'Ciebiera'),
 	('Edgar', 'Codd'),
 	('Raymond', 'Boyce');
-	
+
 CREATE TABLE paper (
     id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name VARCHAR(1023) NOT NULL,
@@ -24,13 +24,13 @@ VALUES
 	('A Relational Model of Data for Large Shared Data Banks', 'Databases'),
 	('SEQUEL: A Structured English Query Language', 'Programming Languages'),
 	('How to Match Jobs and Candidates - A Recruitment Support System Based on Feature Engineering and Advanced Analytics.', 'Recommender systems');
-	
+
 -- SESSION is also a keyword. To tell SQL that we mean the table name,
 -- put it in double quotes. Same applies for WHEN as a keyword and column name.
 CREATE TABLE "session" (
     id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     "when" TIMESTAMP(0) NOT NULL, -- TIMESTAMP is the DATETIME in Postgres
-                                  -- The argument is the precision of seconds. 
+                                  -- The argument is the precision of seconds.
 	                          -- 0 means 0 after decimal point, so up to a second.
     chair_id INTEGER REFERENCES author NOT NULL
 );
@@ -72,7 +72,7 @@ BEGIN
 	SELECT s.chair_id INTO chair_id
 	  FROM "session" s
 	  WHERE id = NEW.session_id;
-	
+
     IF (chair_id = NEW.speaker_id) THEN
       RAISE EXCEPTION 'Lecture with id % defines the session chair as its speaker.', NEW.id;
     END IF;
@@ -80,9 +80,11 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS lecture_chair_cannot_conduct_lecture_trg ON lecture;
+
 -- Note that unlike Oracle we are able to process the data row by row
 -- and it will be completely fine.
-CREATE OR REPLACE TRIGGER lecture_chair_cannot_conduct_lecture_trg
+CREATE TRIGGER lecture_chair_cannot_conduct_lecture_trg
   BEFORE INSERT OR UPDATE OF speaker_id, session_id
   ON lecture
   FOR EACH ROW
@@ -94,12 +96,14 @@ BEGIN
     IF (EXISTS (SELECT 1 FROM lecture l WHERE l.session_id = NEW.id AND l.speaker_id = NEW.chair_id)) THEN
       RAISE EXCEPTION 'Chair % is already a speaker during session %.', NEW.chair_id, NEW.id;
     END IF;
-	
+
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE TRIGGER session_chair_cannot_conduct_lecture_trg
+DROP TRIGGER IF EXISTS session_chair_cannot_conduct_lecture_trg ON lecture;
+
+CREATE TRIGGER session_chair_cannot_conduct_lecture_trg
   BEFORE UPDATE OF id, chair_id
   ON "session"
   FOR EACH ROW
