@@ -12,4 +12,13 @@ public class Paper
 
     public Paper(int paperId, string name, string classification) =>
         (Id, Name, Classification) = (paperId, name, classification);
+
+
+      public string GetAuthorNameList()
+    {
+
+        var displayNames = this.Authors.Select(a => a.DisplayName);
+
+        return string.Join(", ", displayNames);
+    } 
 }

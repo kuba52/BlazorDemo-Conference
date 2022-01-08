@@ -28,14 +28,30 @@
                         <thead>
                             <tr>
                                 <th>Id</th>
+                                <th>Name</th>
+                                <th>Authors</th>
+                                <th>Speaker</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var lecture in session.Lectures)
+                            @if(session.Lectures is not null)
                             {
-                                <tr>
-                                    <td>@lecture.Id</td>
-                                </tr>
+                                @foreach (var lecture in session.Lectures)
+                                {
+                                    <tr>
+                                        <td>@lecture.Id</td>
+                                        @if (lecture.Paper is not null)
+                                        {
+                                            <td>@lecture.Paper.Name</td>
+                                            <td>@lecture.Paper.GetAuthorNameList()</td>
+                                        }
+                                        @if (lecture.Speaker is not null)
+                                        {
+                                            <td>@lecture.Speaker.DisplayName</td>
+                                        }
+                                        
+                                    </tr>
+                                }
                             }
                         </tbody>
                     </table>

@@ -6,6 +6,13 @@ public class Lecture
 
     public DateTime When { get; set; }
 
+    public Author? Speaker { get; set; }
+
+    public Paper? Paper { get; set; }
+
+    public Session? Session { get; set; }
+
     public Lecture(int lectureId, DateTime when) => 
         (Id, When) = (lectureId, when);
+    
 }
